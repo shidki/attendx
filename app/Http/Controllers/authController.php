@@ -14,7 +14,7 @@ class authController extends Controller
     public function login(Request $request){
         try {
             $credentials = $request->validate([
-                'email' => "required|max:255|email",
+                'username' => "required|max:255",
                 'password'=> "required",
             ]);
 
@@ -25,12 +25,6 @@ class authController extends Controller
                     'message' => "username tidak tersedia"
                 ],422);
             }
-            if($user->email_verified_at == null){
-                return response()->json([
-                    "success" => false,
-                    'message' => "Email belum terverifikasi"
-                ],422);
-            }
 
             if(! Hash::check($request->password, $user->password)){
                 return response()->json([
@@ -39,8 +33,6 @@ class authController extends Controller
                 ],422);
             }
             $user->tokens()->delete();
-
-            
             $token = $user->createToken('auth_token')->plainTextToken;
             
             return response()->json([
